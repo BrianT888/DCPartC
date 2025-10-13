@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using DCPartC.Models;
 
 namespace DCPartC.Data
 {
@@ -6,9 +7,10 @@ namespace DCPartC.Data
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.UseSqlite(@"Data Source = Database.db;");
         }
-
+        public DbSet<Client> Client { get; set; }
+        public DbSet<Job> Job { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
