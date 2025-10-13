@@ -8,5 +8,7 @@
 
         public string jobName { get; set; }
         public string jobDescription { get; set; }
+
+        public bool jobStatus { get; set; } = false;
     }
 }

@@ -104,5 +104,42 @@ namespace DCPartC.Controllers
         {
             return _context.Job.Any(e => e.jobId == id);
         }
+
+        [HttpGet]
+        [Route("GetJobsByClientId/{id}")]
+        public async Task<ActionResult<IEnumerable<Job>>> GetJobsByClientId(int id)
+        {
+            var jobs = await _context.Job.Where(j => j.clientId == id).ToListAsync();
+            if (jobs == null || jobs.Count == 0)
+            {
+                return NotFound();
+            }
+            return jobs;
+        }
+
+        [HttpPost]
+        [Route("CreateJobForClient/{clientId}")]
+        public async Task<ActionResult<Job>> CreateJobForClient(int clientId, Job job)
+        {
+            job.clientId = clientId;
+            _context.Job.Add(job);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction("GetJob", new { id = job.jobId }, job);
+        }
+
+        [HttpPut]
+        [Route("FinishedJob/{id}")]
+        public async Task<IActionResult> FinishedJob(int id)
+        {
+            var job = await _context.Job.FindAsync(id);
+            if (job == null)
+            {
+                return NotFound();
+            }
+            job.jobStatus = true;
+            _context.Entry(job).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
     }
 }

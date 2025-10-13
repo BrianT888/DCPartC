@@ -104,5 +104,22 @@ namespace DCPartC.Controllers
         {
             return _context.Client.Any(e => e.clientId == id);
         }
+
+        [HttpPost]
+        [Route("Register/{ip}/{port}")]
+        public async Task<ActionResult<Client>> RegisterClient(string ip, string port)
+        {
+            var client = new Client { ip = ip, port = port };
+            _context.Client.Add(client);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction("GetClient", new { id = client.clientId }, client);
+        }
+
+        [HttpGet]
+        [Route("GetAllClients")]
+        public async Task<ActionResult<IEnumerable<Client>>> GetAllClients()
+        {
+            return await _context.Client.ToListAsync();
+        }
     }
 }
