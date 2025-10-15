@@ -22,11 +22,12 @@ namespace DCPartC.Controllers
         }
 
         // GET: api/Clients
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Client>>> GetClient()
-        {
-            return await _context.Client.ToListAsync();
-        }
+        // can remove probs, already have a duplicate method below with proper route
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<Client>>> GetClient()
+        //{
+        //    return await _context.Client.ToListAsync();
+        //}
 
         // GET: api/Clients/5
         [HttpGet("{id}")]
@@ -43,46 +44,46 @@ namespace DCPartC.Controllers
         }
 
         // PUT: api/Clients/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutClient(int id, Client client)
-        {
-            if (id != client.clientId)
-            {
-                return BadRequest();
-            }
+        //shouldn't be able to update clients not in the spec
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutClient(int id, Client client)
+        //{
+        //    if (id != client.clientId)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            _context.Entry(client).State = EntityState.Modified;
+        //    _context.Entry(client).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ClientExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!ClientExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         // POST: api/Clients
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Client>> PostClient(Client client)
-        {
-            _context.Client.Add(client);
-            await _context.SaveChangesAsync();
+        //this method is also duplicate, since below i have a register format specified already?
+        //[HttpPost]
+        //public async Task<ActionResult<Client>> PostClient(Client client)
+        //{
+        //    _context.Client.Add(client);
+        //    await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetClient", new { id = client.clientId }, client);
-        }
+        //    return CreatedAtAction("GetClient", new { id = client.clientId }, client);
+        //}
 
         // DELETE: api/Clients/5
         [HttpDelete("{id}")]

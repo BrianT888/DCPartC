@@ -43,46 +43,44 @@ namespace DCPartC.Controllers
         }
 
         // PUT: api/Jobs/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutJob(int id, Job job)
-        {
-            if (id != job.jobId)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutJob(int id, Job job)
+        //{
+        //    if (id != job.jobId)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            _context.Entry(job).State = EntityState.Modified;
+        //    _context.Entry(job).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!JobExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!JobExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         // POST: api/Jobs
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Job>> PostJob(Job job)
-        {
-            _context.Job.Add(job);
-            await _context.SaveChangesAsync();
+        //[HttpPost]
+        //public async Task<ActionResult<Job>> PostJob(Job job)
+        //{
+        //    _context.Job.Add(job);
+        //    await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetJob", new { id = job.jobId }, job);
-        }
+        //    return CreatedAtAction("GetJob", new { id = job.jobId }, job);
+        //}
 
         // DELETE: api/Jobs/5
         [HttpDelete("{id}")]
