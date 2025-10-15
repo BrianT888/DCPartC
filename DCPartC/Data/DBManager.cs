@@ -13,7 +13,11 @@ namespace DCPartC.Data
         public DbSet<Job> Job { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Job>()
+                .HasOne<Client>()
+                .WithMany()
+                .HasForeignKey(j => j.clientId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
