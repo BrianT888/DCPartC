@@ -119,7 +119,8 @@ namespace DCPartC.Controllers
         [Route("CreateJobForClient/{clientId}")]
         public async Task<ActionResult<Job>> CreateJobForClient(int clientId, Job job)
         {
-            job.clientId = clientId;
+            job.clientId = clientId; //auto set to client id from url no matter input
+            job.jobStatus = false; //auto set it to false when created no matter input
             _context.Job.Add(job);
             await _context.SaveChangesAsync();
             return CreatedAtAction("GetJob", new { id = job.jobId }, job);
@@ -135,7 +136,6 @@ namespace DCPartC.Controllers
                 return NotFound();
             }
             job.jobStatus = true;
-            _context.Entry(job).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return NoContent();
         }

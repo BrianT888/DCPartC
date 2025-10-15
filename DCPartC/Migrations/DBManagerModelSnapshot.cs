@@ -52,9 +52,23 @@ namespace DCPartC.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("jobStatus")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("jobId");
 
+                    b.HasIndex("clientId");
+
                     b.ToTable("Job");
+                });
+
+            modelBuilder.Entity("DCPartC.Models.Job", b =>
+                {
+                    b.HasOne("DCPartC.Models.Client", null)
+                        .WithMany()
+                        .HasForeignKey("clientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
