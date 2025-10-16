@@ -122,5 +122,12 @@ namespace DCPartC.Controllers
         {
             return await _context.Client.ToListAsync();
         }
+
+        [HttpGet]
+        [Route("GetOtherClients/{id}")]
+        public async Task<ActionResult<IEnumerable<Client>>> GetOtherClients(int id)
+        {
+            return await _context.Client.Where(c => c.clientId != id).ToListAsync();// exclude the client with the specified id in list returned
+        }
     }
 }
