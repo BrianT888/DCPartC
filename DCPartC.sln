@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCPartC", "DCPartC\DCPartC.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientDesktop", "ClientDesktop\ClientDesktop.csproj", "{451705B5-B047-4E05-B90E-3FD03EECAFDA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIClasses", "Library\APIClasses.csproj", "{75B6A415-2DCF-4F0B-A3CC-BAE57C328478}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{451705B5-B047-4E05-B90E-3FD03EECAFDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{451705B5-B047-4E05-B90E-3FD03EECAFDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{451705B5-B047-4E05-B90E-3FD03EECAFDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75B6A415-2DCF-4F0B-A3CC-BAE57C328478}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75B6A415-2DCF-4F0B-A3CC-BAE57C328478}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75B6A415-2DCF-4F0B-A3CC-BAE57C328478}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75B6A415-2DCF-4F0B-A3CC-BAE57C328478}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

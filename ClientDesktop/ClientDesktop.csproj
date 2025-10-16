@@ -151,5 +151,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Library\APIClasses.csproj">
+      <Project>{75b6a415-2dcf-4f0b-a3cc-bae57c328478}</Project>
+      <Name>APIClasses</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

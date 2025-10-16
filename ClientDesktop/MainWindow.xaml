@@ -11,7 +11,7 @@
         <TextBlock x:Name="IPTextBlock" HorizontalAlignment="Center" Margin="0,55,0,0" TextWrapping="Wrap" Text="IP Address" VerticalAlignment="Top"/>
         <TextBlock x:Name="PortTextBlock" HorizontalAlignment="Center" Margin="0,110,0,0" TextWrapping="Wrap" Text="Port" VerticalAlignment="Top"/>
         <TextBox x:Name="PortInput" HorizontalAlignment="Center" Margin="0,142,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <Button x:Name="RegisterClientButton" Content="Register Client IP + Port" HorizontalAlignment="Center" Margin="0,174,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="RegisterClientButton" Content="Register Client IP + Port" HorizontalAlignment="Center" Margin="0,174,0,0" VerticalAlignment="Top" Click="RegisterButton_OnClick"/>
         <TextBlock x:Name="PythonTextBlock" HorizontalAlignment="Left" Margin="91,201,0,0" TextWrapping="Wrap" Text="Python Code" VerticalAlignment="Top" Height="24" Width="84"/>
         <TextBox x:Name="PythonInput" HorizontalAlignment="Center" Margin="0,230,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="618" Height="145"/>
         <Button x:Name="PythonJobSubmitButton" Content="Submit Job" HorizontalAlignment="Center" Margin="0,389,0,0" VerticalAlignment="Top"/>
