@@ -170,5 +170,24 @@ namespace ClientDesktop
             dynamic mainFunc = scope.GetVariable("main");//i assume the codes always gonna be def main():
             var result = mainFunc();//result after main() is called
         }
+
+        //When closing window api call to delete itself from server
+        protected override void OnClosed(EventArgs e)
+        {
+            if (user != null)//to prevent opening and closing a client without registering leading to an api call
+            {
+                string URL = "http://localhost:5199";
+
+                RestClient client = new RestClient(URL);
+                RestRequest deleteRequest = new RestRequest($"/api/clients/{user.clientId}", Method.Delete);
+                var response = client.Execute(deleteRequest);
+
+                if (!response.IsSuccessful)
+                {
+                    Console.WriteLine($"Could not delete from database client {user.clientId}");
+                }
+            }
+
+        }
     }
 }
