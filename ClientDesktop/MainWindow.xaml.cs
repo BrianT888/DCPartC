@@ -104,6 +104,9 @@ namespace ClientDesktop
                         IClientJobServer foob = foobFactory.CreateChannel();
 
                         Console.WriteLine($"Current Client ID: " + user.clientId +  $" Client ID: {otherClient.clientId}, IP: {otherClient.ip}, Port: {otherClient.port}");//console output to show which client is being looked at right now by which user
+                        //ONLY WORKS IF CLIENT IS ALSO OPEN, IF CLOSE REDO 
+                        //got to remove old clients from DB with DELETE somehow
+                        //rn doing it manually on swagger very tiring
 
                         Job job = foob.GetJob();//call GetJob from the other client's server
 
