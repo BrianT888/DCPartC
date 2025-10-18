@@ -99,11 +99,11 @@ namespace ClientDesktop
                         //might need to make a channelfactory here for each client to go to their server.cs and interact with their ClientJobServer.cs
                         ChannelFactory<IClientJobServer> foobFactory;
                         NetTcpBinding tcp = new NetTcpBinding();
-                        string otherClientURL = "net.tcp://127.0.0.1:" + otherClient.port + "/ClientJobServer";//use loopback 127.0.0.1 for connection to self machine
+                        string otherClientURL = $"net.tcp://127.0.0.1:{otherClient.port}/ClientJobServer";//use loopback 127.0.0.1 for connection to self machine
                         foobFactory = new ChannelFactory<IClientJobServer>(tcp, otherClientURL);
                         IClientJobServer foob = foobFactory.CreateChannel();
 
-                        Console.WriteLine($"Current Client ID: " + user.clientId +  $" Client ID: {otherClient.clientId}, IP: {otherClient.ip}, Port: {otherClient.port}");//console output to show which client is being looked at right now by which user
+                        Console.WriteLine($"Current Client ID: {user.clientId} -> Client ID: {otherClient.clientId}, IP: {otherClient.ip}, Port: {otherClient.port}");//console output to show which client is being looked at right now by which user
                         //ONLY WORKS IF CLIENT IS ALSO OPEN, IF CLOSE REDO 
                         //got to remove old clients from DB with DELETE somehow
                         //rn doing it manually on swagger very tiring
@@ -113,8 +113,8 @@ namespace ClientDesktop
                         if (job != null)
                         {
                             //do stuff here
-                            Console.WriteLine("Client " + user.clientId + " obtained job from client ID " + otherClient.clientId);
-                            Console.WriteLine($"Job ID: {job.jobId}, Client ID: {job.clientId}, Job Description: {job.jobDescription}, Job Status: {job.jobStatus}");
+                            Console.WriteLine("Client " + user.clientId + " obtained job from client ID " + otherClient.clientId);//
+                            Console.WriteLine($"Job ID: {job.jobId}, Client ID: {job.clientId}, Job Description: {job.jobDescription}, Job Status: {job.jobStatus}");//
                         }
                         else
                         {
