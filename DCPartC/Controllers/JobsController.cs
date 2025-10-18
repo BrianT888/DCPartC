@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DCPartC.Data;
-using DCPartC.Models;
+using APIClasses;
 
 namespace DCPartC.Controllers
 {
@@ -138,6 +138,22 @@ namespace DCPartC.Controllers
             job.jobStatus = true;
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        [HttpPost]
+        [Route("CreateJob/{clientId}/{jobName}/{jobDesc}")]
+        public async Task<ActionResult<Job>> CreateJob(int clientId, string jobName, string jobDesc)//testing new one maybe nicer?
+        {
+            var job = new Job
+            {
+                clientId = clientId,
+                jobName = jobName,
+                jobDescription = jobDesc,
+                jobStatus = false
+            };
+            _context.Job.Add(job);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction("GetJob", new { id = job.jobId }, job);
         }
     }
 }

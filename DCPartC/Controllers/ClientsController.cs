@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DCPartC.Data;
-using DCPartC.Models;
+using APIClasses;
 
 namespace DCPartC.Controllers
 {
@@ -108,7 +108,7 @@ namespace DCPartC.Controllers
 
         [HttpPost]
         [Route("Register/{ip}/{port}")]
-        public async Task<ActionResult<Client>> RegisterClient(string ip, string port)
+        public async Task<ActionResult<Client>> RegisterClient(string ip, int port)
         {
             var client = new Client { ip = ip, port = port };
             _context.Client.Add(client);

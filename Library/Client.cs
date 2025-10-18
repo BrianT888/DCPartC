@@ -10,6 +10,6 @@ namespace APIClasses
     {
         public int clientId { get; set; }
         public string ip { get; set; }
-        public string port { get; set; }
+        public int port { get; set; }
     }
 }

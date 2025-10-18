@@ -13,7 +13,7 @@ namespace APIClasses
         public int clientId { get; set; }
 
         public string jobName { get; set; }
-        public string jobDescription { get; set; }
+        public string jobDescription { get; set; }//python script
 
         public bool jobStatus { get; set; } = false;
     }
