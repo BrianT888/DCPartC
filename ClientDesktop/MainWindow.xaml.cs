@@ -45,6 +45,10 @@ namespace ClientDesktop
                     return;
                 }
 
+                //server and network threads might need to be a if one succeeds then start the other
+                //rn its more like starting up the server, but not networking because idk registration failed?
+                //maybe network first before starting up server?
+
                 server.StartServer(ip, port);//start server thread with ip + port provided
 
                 Networking(ip, port);
@@ -99,9 +103,16 @@ namespace ClientDesktop
 
                         Console.WriteLine($"Current Client ID: " + user.clientId +  $" Client ID: {otherClient.clientId}, IP: {otherClient.ip}, Port: {otherClient.port}");//console output to show which client is being looked at right now by which user
 
-                        foob.GetJob();//call GetJob from the other client's server
+                        Job job = foob.GetJob();//call GetJob from the other client's server
 
-
+                        if (job != null)
+                        {
+                            //do stuff here
+                        }
+                        else
+                        {
+                            Console.WriteLine("No job available from client ID " + otherClient.clientId);
+                        }
 
                         //RestRequest jobRequest = new RestRequest($"/api/jobs/GetJobsByClientId/{otherClient.clientId}", Method.Get);
                         //var jobResponse = await client.ExecuteAsync(jobRequest);
@@ -113,9 +124,9 @@ namespace ClientDesktop
                         //        if (job.jobStatus) continue; // Skip already finished jobs
 
                         //        Console.WriteLine($"Job ID: {job.jobId}, Client ID: {job.clientId}, Job Description: {job.jobDescription}, Job Status: {job.jobStatus}");
-                                
+
                         //        Task.Delay(4000).Wait(); // Simulate job processing time
-                                
+
                         //        // Mark the job as finished
                         //        RestRequest finishJobRequest = new RestRequest($"/api/jobs/FinishedJob/{job.jobId}", Method.Put);
                         //        var finishJobResponse = await client.ExecuteAsync(finishJobRequest);
