@@ -7,6 +7,8 @@ using System;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.ServiceModel;
+using Microsoft.Scripting.Hosting;
+using IronPython.Hosting;
 
 namespace ClientDesktop
 {
@@ -97,7 +99,7 @@ namespace ClientDesktop
                         //might need to make a channelfactory here for each client to go to their server.cs and interact with their ClientJobServer.cs
                         ChannelFactory<IClientJobServer> foobFactory;
                         NetTcpBinding tcp = new NetTcpBinding();
-                        string otherClientURL = "net.tcp://" + otherClient.port + "/ClientJobServer";
+                        string otherClientURL = "net.tcp://127.0.0.1:" + otherClient.port + "/ClientJobServer";//use loopback 127.0.0.1 for connection to self machine
                         foobFactory = new ChannelFactory<IClientJobServer>(tcp, otherClientURL);
                         IClientJobServer foob = foobFactory.CreateChannel();
 
@@ -108,6 +110,8 @@ namespace ClientDesktop
                         if (job != null)
                         {
                             //do stuff here
+                            Console.WriteLine("Client " + user.clientId + " obtained job from client ID " + otherClient.clientId);
+                            Console.WriteLine($"Job ID: {job.jobId}, Client ID: {job.clientId}, Job Description: {job.jobDescription}, Job Status: {job.jobStatus}");
                         }
                         else
                         {
@@ -152,6 +156,16 @@ namespace ClientDesktop
                     MessageBox.Show("Failed to retrieve other clients: " + response.ErrorMessage);
                 }
             }
+        }
+
+        //string python code = job.jobDescription;
+        private void RunPythonJobDescription(string pythonCode)
+        {
+            ScriptEngine engine = Python.CreateEngine();
+            ScriptScope scope = engine.CreateScope();
+            engine.Execute(pythonCode, scope);
+            dynamic mainFunc = scope.GetVariable("main");//i assume the codes always gonna be def main():
+            var result = mainFunc();//result after main() is called
         }
     }
 }
