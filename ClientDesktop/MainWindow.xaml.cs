@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -23,7 +24,6 @@ namespace ClientDesktop
     /// </summary>
     public partial class MainWindow : Window
     {
-        //private ClientJobServer foobServer = new ClientJobServer();//Clients own job server//ok this is like mega local no work
         private Client user;
         private Server server;
         private RestClient client;
@@ -35,14 +35,15 @@ namespace ClientDesktop
             Working
         }
         private clientStatus status = clientStatus.Idle;
-        bool loop = true;
+        private bool loop;
+        private int i;
         public MainWindow()
         {
             InitializeComponent();
             server = new Server();//new server thread
         }
 
-        private void RegisterButton_OnClick(object sender, RoutedEventArgs e)
+        private async void RegisterButton_OnClick(object sender, RoutedEventArgs e)
         {
             Console.WriteLine("Register Button Clicked");
 
@@ -56,17 +57,28 @@ namespace ClientDesktop
                     return;
                 }
                 
-                //might need an ip address validation for it to be only numbers and dots
-
                 if (port < 1 || port > 65535)//port validation
                 {
                     MessageBox.Show("Port number must be between 1 and 65535.");
                     return;
                 }
 
-                //server and network threads might need to be a if one succeeds then start the other
-                //rn its more like starting up the server, but not networking because idk registration failed?
-                //maybe network first before starting up server?
+                string URL = "http://localhost:5199";
+
+                client = new RestClient(URL);
+
+                RestRequest registerRequest = new RestRequest($"/api/clients/Register/{ip}/{port}", Method.Post);
+                var registerResponse = await client.ExecuteAsync(registerRequest);
+                if (!registerResponse.IsSuccessful)
+                {
+                    MessageBox.Show("Failed to register client: " + registerResponse.ErrorMessage);
+                    return;
+                }
+
+                MessageBox.Show("Client registered successfully!");
+                user = JsonConvert.DeserializeObject<Client>(registerResponse.Content);
+
+                loop = true;
 
                 server.StartServer(ip, port);//start server thread with ip + port provided
 
@@ -86,10 +98,9 @@ namespace ClientDesktop
             if (user != null)//make sure you can't submit without being registered first
             {
                 Console.WriteLine($"{user.clientId} is Submitting Supposed Python Job");
-                //Console.WriteLine($"{user.clientId} job list has: {foobServer.GetNumberOfJobs()}");
                 //api call + client job server call to save jobs
                 string pythonName = PythonInput.Text;// = PythonNameInput.Text;
-                string pythonJob = PythonInput.Text;//lowk need another input box for the name of the python job this right here just the description part
+                string pythonJob = PythonInput.Text;
 
                 //Encoding and Hashing
                 byte[] encodedArray = Encoding.UTF8.GetBytes(pythonJob);
@@ -105,7 +116,6 @@ namespace ClientDesktop
                 newJob.jobStatus = Job.Status.NotStarted;
                 //leave job Id as db will auto set it 
 
-                //RestRequest request = new RestRequest($"/api/jobs/CreateJob/{user.clientId}/{pythonName}/{encoded}", Method.Post);
                 RestRequest request = new RestRequest($"/api/jobs", Method.Post);
                 request.AddJsonBody(newJob);
 
@@ -117,9 +127,6 @@ namespace ClientDesktop
                 } else
                 {
                     Job job = JsonConvert.DeserializeObject<Job>(pythonJobResponse.Content);
-                    //foobServer.SubmitJob(job);//submit python job object to clients own server 
-                    //server.submittingJob(job);
-                    //ClientJobServer.jobList.Enqueue(job);
                     Console.WriteLine($"{user.clientId} : {job.jobId}: {job.jobDescription} ({job.jobName})");
                     server.submitJob(job);
                     Console.WriteLine($"Entered job into {user.clientId}'s server: {job.jobId} {job.jobDescription}");
@@ -133,33 +140,11 @@ namespace ClientDesktop
         }
         private async Task Networking(string ip, int port)
         {
-            //Network only thread that connects to server in spec
-            string URL = "http://localhost:5199";
-
-            client = new RestClient(URL);
-
-            RestRequest registerRequest = new RestRequest($"/api/clients/Register/{ip}/{port}", Method.Post);
-            var registerResponse = await client.ExecuteAsync(registerRequest);
-            if (!registerResponse.IsSuccessful)
-            {
-                //lowk could fail here once i do error handling people can't use idk the same ip or smt same ip + port combo 
-                Dispatcher.Invoke(() =>
-                {
-                    MessageBox.Show("Failed to register client: " + registerResponse.ErrorMessage);
-                });
-                return;
-            }
-
-            Dispatcher.Invoke(() =>
-            {
-                MessageBox.Show("Client registered successfully!");
-            });
-            user = JsonConvert.DeserializeObject<Client>(registerResponse.Content);
-            //maybe a check to make sure user isn't null after?
-            //tho it might not be able to be null if the registration is successful
-
+            i = 0;
             while (loop)
             {
+                i++;
+
                 RestRequest request = new RestRequest("/api/clients/GetOtherClients/" + user.clientId, Method.Get);//in while loop to get new clients constantly after finishing scanning everyone
                 var response = await client.ExecuteAsync(request);
 
@@ -170,12 +155,18 @@ namespace ClientDesktop
 
                     // Process the list of other clients as needed
                     Console.WriteLine($"{user.clientId} sees Amount of other clients: {otherClients.Count}");
-                    
+                    Console.WriteLine($"ye{i}");
+
                     status = clientStatus.FindingJob;
 
                     foreach (var otherClient in otherClients)
                     {
-                        //might need to make a channelfactory here for each client to go to their server.cs and interact with their ClientJobServer.cs
+                        if (!loop)
+                        {
+                            Console.WriteLine("Trying to exit for each loop");
+                            break;
+                        }
+
                         ChannelFactory<IClientJobServer> foobFactory;
                         NetTcpBinding tcp = new NetTcpBinding();
                         string otherClientURL = $"net.tcp://127.0.0.1:{otherClient.port}/ClientJobServer";//use loopback 127.0.0.1 for connection to self machine
@@ -193,8 +184,14 @@ namespace ClientDesktop
                             {
                                 Console.WriteLine("Jobs already done");
                                 foob.Execute(job);
-                                break;//go look at diff client
+                                continue;//go look at diff client
                             }
+                            if (!loop)
+                            {
+                                Console.WriteLine("Trying to exit for each loop");
+                                break;
+                            }
+
                             //do stuff here
                             Console.WriteLine("Client " + user.clientId + " obtained job from client ID " + otherClient.clientId);//
                             Console.WriteLine($"Job ID: {job.jobId}, Client ID: {job.clientId}, Job Description: {job.jobDescription}, Job Status: {job.jobStatus}");//
@@ -210,13 +207,12 @@ namespace ClientDesktop
                             {
                                 if (hashCheck.SequenceEqual(job.hash))
                                 {
+                                    if (!loop)
+                                    {
+                                        Console.WriteLine("Trying to exit for each loop");
+                                        break;
+                                    }
                                     status = clientStatus.Working;
-                                    //start executing so set job to in progress
-                                    job.jobStatus = Job.Status.Progressing;
-
-                                    //foob.Execute(job);
-                                    //ui should also show that we're in progress doing code
-
 
                                     Console.WriteLine($"Client {user.clientId} has found Hashes are equal for {job.jobId}");
                                     //Since hashes are the same, can get string from encoded array as it isn't corrupted
@@ -224,8 +220,8 @@ namespace ClientDesktop
                                     Console.WriteLine($"Client {user.clientId} picked up job with python script :({python}) from {otherClient.clientId}");
 
                                     //Using python string which is the python script, let the iron python run it
-                                    dynamic result = RunPythonJobDescription(python);//should check if this works first idk
-                                    Task.Delay(2000).Wait();
+                                    dynamic result = RunPythonJobDescription(python);
+                                    await Task.Delay(2000);
                                     string res = Convert.ToString(result);
                                     if (result != null)
                                     {
@@ -236,6 +232,10 @@ namespace ClientDesktop
                                         RestRequest request1 = new RestRequest($"api/jobs/FinishedJob/{res}", Method.Put);
                                         request1.AddJsonBody(job);
                                         var response1 = await client.ExecuteAsync(request1);
+                                        if (!response1.IsSuccessful)
+                                        {
+                                            Console.WriteLine("not sucessful " + response1.ErrorMessage);
+                                        }
                                         status = clientStatus.FindingJob;
                                     }
 
@@ -244,26 +244,19 @@ namespace ClientDesktop
                                     Console.WriteLine($"Hashes do not match, something went wrong");
                                 }
                             }
-
                         }
                         else
                         {
                             Console.WriteLine("No job available from client ID " + otherClient.clientId);
-                        }
-
-                        Task.Delay(5000).Wait();
+                        } 
                     }
-
-                    Task.Delay(3000).Wait();
                 }
                 else
                 {
-                    Dispatcher.Invoke(() =>
-                    {
-                        MessageBox.Show("Failed to retrieve other clients: " + response.ErrorMessage);
-                    });
-
+                    Console.WriteLine($"{user.clientId} can not see anyone");
                 }
+
+                await Task.Delay(1000);
             }
         }
 
@@ -273,11 +266,10 @@ namespace ClientDesktop
             Task.Run(() => Networking(ip, port));
         }
 
-        //string python code = job.jobDescription;
         private dynamic RunPythonJobDescription(string pythonCode)
         {
             dynamic result = null;
-            if (pythonCode.Contains("print(") )//parses and gets the middle value of the print
+            if (pythonCode.Contains("print(") )//parses and gets the middle value of the print()
             {
                 pythonCode = pythonCode.Split('(', ')')[1];
                 Console.WriteLine("Just split " + pythonCode);
@@ -287,7 +279,6 @@ namespace ClientDesktop
             {
                 ScriptEngine engine = Python.CreateEngine();
                 ScriptScope scope = engine.CreateScope();
-                Console.ReadLine();
                 result = engine.Execute(pythonCode, scope);
                 Console.WriteLine("Inside python " + result);
             }
@@ -299,21 +290,24 @@ namespace ClientDesktop
         }
 
         //When closing window api call to delete itself from server
-        protected override void OnClosed(EventArgs e)
+        protected override async void OnClosing(CancelEventArgs e)
         {
+            this.Title = "Closing client threads, Please wait";
+
+            loop = false;//stops networking loop
+
             if (user != null)//to prevent opening and closing a client without registering leading to an api call
             {
                 RestRequest deleteRequest = new RestRequest($"/api/clients/{user.clientId}", Method.Delete);
-                var response = client.Execute(deleteRequest);
+                var response = await client.ExecuteAsync(deleteRequest);
                 server.StopServer();
-                loop = false;//stops networking loop
 
                 if (!response.IsSuccessful)
                 {
                     Console.WriteLine($"Could not delete from database client {user.clientId}");
                 }
-            }
 
+            }
         }
 
         //To see if client is working on a job or not

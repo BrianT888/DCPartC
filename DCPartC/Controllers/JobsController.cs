@@ -130,6 +130,10 @@ namespace DCPartC.Controllers
         [Route("FinishedJob/{result}")]
         public async Task<IActionResult> FinishedJob(string result, [FromBody]Job job)
         {
+            if(job == null)
+            {
+                return BadRequest("Null Job for Finished Job");
+            }
             Job currentJob = await _context.Job.FindAsync(job.jobId);
             currentJob.Result = result;
             currentJob.jobStatus = job.jobStatus;

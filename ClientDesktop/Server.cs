@@ -17,7 +17,6 @@ namespace ClientDesktop
                 {
                     host = new ServiceHost(typeof(ClientJobServer));
                     NetTcpBinding tcp = new NetTcpBinding();
-
                     host.AddServiceEndpoint(typeof(IClientJobServer), tcp, $"net.tcp://0.0.0.0:{port}/ClientJobServer");//have to use 0.0.0.0 or 127.0.0.1 instead of ip var because nettcp doesn't allow unavail ips
                     //only other ip address that can be hosted is the machines own ipv4 address through win + r -> cmd -> ipconfig -> IPv4 Address...
                     host.Open();
@@ -39,8 +38,15 @@ namespace ClientDesktop
         {
             if (host != null)
             {
-                host.Close();
-                Console.WriteLine("Server stopped.");
+                try
+                {
+                    host.Close();
+                    Console.WriteLine("Server stopped.");
+                }
+                catch (Exception ex)
+                {
+                    host.Abort();
+                }
             }
         }
     }

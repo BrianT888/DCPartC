@@ -110,6 +110,12 @@ namespace DCPartC.Controllers
         [Route("Register/{ip}/{port}")]
         public async Task<ActionResult<Client>> RegisterClient(string ip, int port)
         {
+            var eclient = await _context.Client.FirstOrDefaultAsync(c => c.port == port);
+            if (eclient != null)//client found with the port already exists
+            {
+                return BadRequest("Duplicate port found");
+            }
+
             var client = new Client { ip = ip, port = port };
             _context.Client.Add(client);
             await _context.SaveChangesAsync();
@@ -120,14 +126,25 @@ namespace DCPartC.Controllers
         [Route("GetAllClients")]
         public async Task<ActionResult<IEnumerable<Client>>> GetAllClients()
         {
-            return await _context.Client.ToListAsync();
+            List<Client> clientList = await _context.Client.ToListAsync();
+            if (clientList.Count() < 1)
+            {
+                return BadRequest();
+            }
+            return clientList;
         }
 
         [HttpGet]
         [Route("GetOtherClients/{id}")]
         public async Task<ActionResult<IEnumerable<Client>>> GetOtherClients(int id)
         {
-            return await _context.Client.Where(c => c.clientId != id).ToListAsync();// exclude the client with the specified id in list returned
+            List<Client> clientList = await _context.Client.Where(c => c.clientId != id).ToListAsync();// exclude the client with the specified id in list returned
+            if (clientList.Count() < 1)
+            {
+                return BadRequest();
+            }
+
+            return clientList;
         }
     }
 }
