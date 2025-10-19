@@ -17,6 +17,6 @@
         <Button x:Name="PythonJobSubmitButton" Content="Submit Job" HorizontalAlignment="Center" Margin="0,389,0,0" VerticalAlignment="Top" Click="PythonJobSubmitButton_OnClick"/>
         <TextBlock x:Name="ClientWorkingTextBlock" HorizontalAlignment="Left" Margin="638,55,0,0" TextWrapping="Wrap" Text="Working?" VerticalAlignment="Top"/>
         <TextBlock x:Name="JobCountTextBlock" HorizontalAlignment="Left" Margin="630,110,0,0" TextWrapping="Wrap" Text="Jobs Finished:" VerticalAlignment="Top"/>
-        <Button x:Name="RefreshUIButton" Content="Refresh" HorizontalAlignment="Left" Margin="641,174,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="RefreshUIButton" Content="Refresh" HorizontalAlignment="Left" Margin="641,174,0,0" VerticalAlignment="Top" Click="Refresh_OnClick"/>
     </Grid>
 </Window>

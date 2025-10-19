@@ -6,7 +6,7 @@ namespace APIClasses
     public interface IClientJobServer
     {
         [OperationContract]
-        string Execute(string python);//upload answer
+        void Execute(Job job);//upload answer
         [OperationContract]
         bool GetStatus();
         [OperationContract]

@@ -73,14 +73,14 @@ namespace DCPartC.Controllers
         //}
 
         // POST: api/Jobs
-        //[HttpPost]
-        //public async Task<ActionResult<Job>> PostJob(Job job)
-        //{
-        //    _context.Job.Add(job);
-        //    await _context.SaveChangesAsync();
+        [HttpPost]
+        public async Task<ActionResult<Job>> PostJob(Job job)
+        {
+            _context.Job.Add(job);
+            await _context.SaveChangesAsync();
 
-        //    return CreatedAtAction("GetJob", new { id = job.jobId }, job);
-        //}
+            return CreatedAtAction("GetJob", new { id = job.jobId }, job);
+        }
 
         // DELETE: api/Jobs/5
         [HttpDelete("{id}")]
@@ -115,45 +115,43 @@ namespace DCPartC.Controllers
             return jobs;
         }
 
-        [HttpPost]
-        [Route("CreateJobForClient/{clientId}")]
-        public async Task<ActionResult<Job>> CreateJobForClient(int clientId, Job job)
-        {
-            job.clientId = clientId; //auto set to client id from url no matter input
-            job.jobStatus = false; //auto set it to false when created no matter input
-            _context.Job.Add(job);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction("GetJob", new { id = job.jobId }, job);
-        }
+        //[HttpPost]
+        //[Route("CreateJobForClient/{clientId}")]
+        //public async Task<ActionResult<Job>> CreateJobForClient(int clientId, Job job)
+        //{
+        //    job.clientId = clientId; //auto set to client id from url no matter input
+        //    job.jobStatus = Job.Status.NotStarted; //auto set it to false when created no matter input
+        //    _context.Job.Add(job);
+        //    await _context.SaveChangesAsync();
+        //    return CreatedAtAction("GetJob", new { id = job.jobId }, job);
+        //}
 
         [HttpPut]
-        [Route("FinishedJob/{id}")]
-        public async Task<IActionResult> FinishedJob(int id)
+        [Route("FinishedJob/{result}")]
+        public async Task<IActionResult> FinishedJob(string result, [FromBody]Job job)
         {
-            var job = await _context.Job.FindAsync(id);
-            if (job == null)
-            {
-                return NotFound();
-            }
-            job.jobStatus = true;
+            Job currentJob = await _context.Job.FindAsync(job.jobId);
+            currentJob.Result = result;
+            currentJob.jobStatus = job.jobStatus;
             await _context.SaveChangesAsync();
             return NoContent();
         }
 
-        [HttpPost]
-        [Route("CreateJob/{clientId}/{jobName}/{jobDesc}")]
-        public async Task<ActionResult<Job>> CreateJob(int clientId, string jobName, string jobDesc)//testing new one maybe nicer?
-        {
-            var job = new Job
-            {
-                clientId = clientId,
-                jobName = jobName,
-                jobDescription = jobDesc,
-                jobStatus = false
-            };
-            _context.Job.Add(job);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction("GetJob", new { id = job.jobId }, job);
-        }
+        //[HttpPost]
+        //[Route("CreateJob/{clientId}/{jobName}/{jobDesc}/{hashed}")]
+        //public async Task<ActionResult<Job>> CreateJob(int clientId, string jobName, string jobDesc, string hashed)//testing new one maybe nicer?
+        //{
+        //    var job = new Job
+        //    {
+        //        clientId = clientId,
+        //        jobName = jobName,
+        //        jobDescription = jobDesc,
+        //        jobStatus = Job.Status.NotStarted,
+        //        hash = hashed,
+        //    };
+        //    _context.Job.Add(job);
+        //    await _context.SaveChangesAsync();
+        //    return CreatedAtAction("GetJob", new { id = job.jobId }, job);
+        //}
     }
 }

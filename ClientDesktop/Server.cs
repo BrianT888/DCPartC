@@ -9,15 +9,12 @@ namespace ClientDesktop
     public class Server
     {
         private ServiceHost host;
-        private ClientJobServer jobServer;
         public void StartServer(string ip, int port)
         {
             Task.Run(() =>//have it run on a background thread and not stop since host.close is in diff method, the server will stay open after host.open
             {
                 try
                 {
-                    //jobServer = new ClientJobServer();
-                    //host = new ServiceHost(jobServer);
                     host = new ServiceHost(typeof(ClientJobServer));
                     NetTcpBinding tcp = new NetTcpBinding();
 
@@ -31,11 +28,6 @@ namespace ClientDesktop
                     Console.WriteLine("Failed to start server: " + ex.Message);
                 }
             });
-        }
-
-        public void submittingJob(Job job)
-        {
-            jobServer.SubmitJob(job);
         }
 
         public void submitJob(Job job)

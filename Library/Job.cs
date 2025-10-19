@@ -14,7 +14,15 @@ namespace APIClasses
 
         public string jobName { get; set; }
         public string jobDescription { get; set; }//python script
+        public byte[] hash { get; set; }//for sha and checking python script didn't lost anything
 
-        public bool jobStatus { get; set; } = false;//lowk might have to change this into smt that can be posted for more description?
+        public enum Status {
+            NotStarted,
+            Progressing,
+            Finished
+        };
+
+        public Status jobStatus { get; set; }
+        public string Result { get; set; }//to store back whatever is the result of the python code
     }
 }

@@ -10,9 +10,10 @@ namespace ClientDesktop
     public class ClientJobServer : IClientJobServer
     {
         public static ConcurrentQueue<Job> jobList = new ConcurrentQueue<Job>();//list of jobs in server in concurrent q for thread safety if multiple access the data at once
-        public string Execute(string python)//run the python code tho idk how to do that yet
+        public void Execute(Job job)
         {
-            throw new System.NotImplementedException();
+            job.jobStatus = Job.Status.Finished;
+            jobList.Enqueue(job);//put it back into the list
         }
 
         public Job GetJob()
@@ -25,6 +26,15 @@ namespace ClientDesktop
             {
                 return null; // No job available for null check
             }
+            //0 = not started, 1=progress, 2=finished
+            //foreach (Job job in jobList)
+            //{
+            //    if (job.jobStatus == 0)
+            //    {
+            //        return job;
+            //    }
+            //}
+            //return null;
         }
 
         public bool GetStatus()//do i need to get status?
