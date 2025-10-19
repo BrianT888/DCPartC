@@ -1,14 +1,15 @@
-﻿using RestSharp;
-using System.Collections.Generic;
-using System.Windows;
-using APIClasses;
-using Newtonsoft.Json;
-using System;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using System.ServiceModel;
-using Microsoft.Scripting.Hosting;
+﻿using APIClasses;
 using IronPython.Hosting;
+using Microsoft.Scripting.Hosting;
+using Newtonsoft.Json;
+using RestSharp;
+using System;
+using System.Collections.Generic;
+using System.Security.Policy;
+using System.ServiceModel;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace ClientDesktop
 {
@@ -17,8 +18,10 @@ namespace ClientDesktop
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ClientJobServer foobServer = new ClientJobServer();//Clients own job server//ok this is like mega local no work
         private Client user;
         private Server server;
+        private RestClient client;
         public MainWindow()
         {
             InitializeComponent();
@@ -53,7 +56,7 @@ namespace ClientDesktop
 
                 server.StartServer(ip, port);//start server thread with ip + port provided
 
-                Networking(ip, port);
+                StartNetworkThread(ip, port);
                 //disable register button
                 RegisterClientButton.Visibility = Visibility.Hidden;
 
@@ -63,20 +66,62 @@ namespace ClientDesktop
                 return;
             }
         }
-        private async void Networking(string ip, int port)
+
+        private async void PythonJobSubmitButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (user != null)//make sure you can't submit without being registered first
+            {
+                Console.WriteLine($"{user.clientId} is Submitting Supposed Python Job");
+                Console.WriteLine($"{user.clientId} job list has: {foobServer.GetNumberOfJobs()}");
+                //api call + client job server call to save jobs
+                string pythonName = "name";// = PythonNameInput.Text;
+                string pythonJob = PythonInput.Text;//lowk need another input box for the name of the python job this right here just the description part
+
+                RestRequest request = new RestRequest($"/api/jobs/CreateJob/{user.clientId}/{pythonName}/{pythonJob}", Method.Post);
+                var pythonJobResponse = await client.ExecuteAsync(request);
+                if (!pythonJobResponse.IsSuccessful)
+                {
+                    MessageBox.Show("Failed to submit job to DB");
+                    return;
+                } else
+                {
+                    Job job = JsonConvert.DeserializeObject<Job>(pythonJobResponse.Content);
+                    //foobServer.SubmitJob(job);//submit python job object to clients own server 
+                    //server.submittingJob(job);
+                    //ClientJobServer.jobList.Enqueue(job);
+                    Console.WriteLine($"{user.clientId} : {job.jobDescription} ({job.jobName})");
+                    server.submitJob(job);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please Register first");
+                return;
+            }
+        }
+        private async Task Networking(string ip, int port)
         {
             //Network only thread that connects to server in spec
             string URL = "http://localhost:5199";
 
-            RestClient client = new RestClient(URL);
+            client = new RestClient(URL);
+
             RestRequest registerRequest = new RestRequest($"/api/clients/Register/{ip}/{port}", Method.Post);
             var registerResponse = await client.ExecuteAsync(registerRequest);
             if (!registerResponse.IsSuccessful)
             {
-                MessageBox.Show("Failed to register client: " + registerResponse.ErrorMessage);
+                //lowk could fail here once i do error handling people can't use idk the same ip or smt same ip + port combo 
+                Dispatcher.Invoke(() =>
+                {
+                    MessageBox.Show("Failed to register client: " + registerResponse.ErrorMessage);
+                });
                 return;
             }
-            MessageBox.Show("Client registered successfully!");
+
+            Dispatcher.Invoke(() =>
+            {
+                MessageBox.Show("Client registered successfully!");
+            });
             user = JsonConvert.DeserializeObject<Client>(registerResponse.Content);
             //maybe a check to make sure user isn't null after?
             //tho it might not be able to be null if the registration is successful
@@ -88,11 +133,11 @@ namespace ClientDesktop
 
                 if (response.IsSuccessful)
                 {
-                    
+
                     var otherClients = JsonConvert.DeserializeObject<List<Client>>(response.Content);
 
                     // Process the list of other clients as needed
-                    Console.WriteLine("Amount of other clients: " + otherClients.Count);
+                    Console.WriteLine($"{user.clientId} sees Amount of other clients: {otherClients.Count}");
 
                     foreach (var otherClient in otherClients)
                     {
@@ -105,8 +150,6 @@ namespace ClientDesktop
 
                         Console.WriteLine($"Current Client ID: {user.clientId} -> Client ID: {otherClient.clientId}, IP: {otherClient.ip}, Port: {otherClient.port}");//console output to show which client is being looked at right now by which user
                         //ONLY WORKS IF CLIENT IS ALSO OPEN, IF CLOSE REDO 
-                        //got to remove old clients from DB with DELETE somehow
-                        //rn doing it manually on swagger very tiring
 
                         Job job = foob.GetJob();//call GetJob from the other client's server
 
@@ -121,44 +164,26 @@ namespace ClientDesktop
                             Console.WriteLine("No job available from client ID " + otherClient.clientId);
                         }
 
-                        //RestRequest jobRequest = new RestRequest($"/api/jobs/GetJobsByClientId/{otherClient.clientId}", Method.Get);
-                        //var jobResponse = await client.ExecuteAsync(jobRequest);
-                        //if (jobResponse.IsSuccessful)
-                        //{
-                        //    var jobs = JsonConvert.DeserializeObject<List<Job>>(jobResponse.Content);
-                        //    foreach (var job in jobs)
-                        //    {
-                        //        if (job.jobStatus) continue; // Skip already finished jobs
-
-                        //        Console.WriteLine($"Job ID: {job.jobId}, Client ID: {job.clientId}, Job Description: {job.jobDescription}, Job Status: {job.jobStatus}");
-
-                        //        Task.Delay(4000).Wait(); // Simulate job processing time
-
-                        //        // Mark the job as finished
-                        //        RestRequest finishJobRequest = new RestRequest($"/api/jobs/FinishedJob/{job.jobId}", Method.Put);
-                        //        var finishJobResponse = await client.ExecuteAsync(finishJobRequest);
-                        //        if (finishJobResponse.IsSuccessful)
-                        //        {
-                        //            Console.WriteLine($"Job ID: {job.jobId} marked as finished.");
-                        //        }
-                        //        else
-                        //        {
-                        //            Console.WriteLine($"Failed to mark Job ID: {job.jobId} as finished. Error: {finishJobResponse.ErrorMessage}");
-                        //        }
-                        //    }
-                        //}
-                        //else
-                        //{
-                        //    Console.WriteLine("Failed to retrieve jobs for client ID " + otherClient.clientId + ": " + jobResponse.ErrorMessage);
-                        //    Task.Delay(5000).Wait(); // Wait before retrying
-                        //}
+                        Task.Delay(5000).Wait();
                     }
+
+                    Task.Delay(3000).Wait();
                 }
                 else
                 {
-                    MessageBox.Show("Failed to retrieve other clients: " + response.ErrorMessage);
+                    Dispatcher.Invoke(() =>
+                    {
+                        MessageBox.Show("Failed to retrieve other clients: " + response.ErrorMessage);
+                    });
+
                 }
             }
+        }
+
+        //make the networking run on a different thread
+        private void StartNetworkThread(string ip, int port)
+        {
+            Task.Run(() => Networking(ip, port));
         }
 
         //string python code = job.jobDescription;
@@ -176,9 +201,6 @@ namespace ClientDesktop
         {
             if (user != null)//to prevent opening and closing a client without registering leading to an api call
             {
-                string URL = "http://localhost:5199";
-
-                RestClient client = new RestClient(URL);
                 RestRequest deleteRequest = new RestRequest($"/api/clients/{user.clientId}", Method.Delete);
                 var response = client.Execute(deleteRequest);
 

@@ -11,7 +11,5 @@ namespace APIClasses
         bool GetStatus();
         [OperationContract]
         Job GetJob();//download job
-        [OperationContract]
-        void SubmitJob(Job job);//submit job back to server
     }
 }

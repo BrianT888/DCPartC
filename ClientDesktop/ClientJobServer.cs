@@ -7,9 +7,9 @@ using System.ServiceModel;
 namespace ClientDesktop
 {
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
-    internal class ClientJobServer : IClientJobServer
+    public class ClientJobServer : IClientJobServer
     {
-        private ConcurrentQueue<Job> jobList = new ConcurrentQueue<Job>();//list of jobs in server in concurrent q for thread safety if multiple access the data at once
+        public static ConcurrentQueue<Job> jobList = new ConcurrentQueue<Job>();//list of jobs in server in concurrent q for thread safety if multiple access the data at once
         public string Execute(string python)//run the python code tho idk how to do that yet
         {
             throw new System.NotImplementedException();
@@ -35,6 +35,11 @@ namespace ClientDesktop
         public void SubmitJob(Job job)
         {
             jobList.Enqueue(job);//add job to the back of queue
+        }
+
+        public int GetNumberOfJobs()
+        {
+            return jobList.Count;
         }
     }
 }

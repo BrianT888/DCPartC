@@ -15,6 +15,6 @@ namespace APIClasses
         public string jobName { get; set; }
         public string jobDescription { get; set; }//python script
 
-        public bool jobStatus { get; set; } = false;
+        public bool jobStatus { get; set; } = false;//lowk might have to change this into smt that can be posted for more description?
     }
 }
