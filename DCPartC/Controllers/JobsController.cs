@@ -80,7 +80,7 @@ namespace DCPartC.Controllers
             var jobs = await _context.Job.Where(j => j.clientId == id).ToListAsync();
             if (jobs == null || jobs.Count == 0)
             {
-                return NotFound();
+                return NotFound($"No Jobs by Client {id}");
             }
             return jobs;
         }
@@ -91,7 +91,7 @@ namespace DCPartC.Controllers
         {
             if(job == null)
             {
-                return NotFound();
+                return NotFound("Job not found");
             }
             Job currentJob = await _context.Job.FindAsync(job.jobId);
             currentJob.Result = result;

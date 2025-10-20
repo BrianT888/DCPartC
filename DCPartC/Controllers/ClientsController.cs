@@ -95,7 +95,7 @@ namespace DCPartC.Controllers
             List<Client> clientList = await _context.Client.ToListAsync();
             if (clientList.Count() < 1)
             {
-                return BadRequest();
+                return NotFound("Empty Client list");
             }
             return clientList;
         }
@@ -107,7 +107,7 @@ namespace DCPartC.Controllers
             List<Client> clientList = await _context.Client.Where(c => c.clientId != id).ToListAsync();// exclude the client with the specified id in list returned
             if (clientList.Count() < 1)
             {
-                return BadRequest();
+                return NotFound("No Other Clients");
             }
 
             return clientList;
@@ -120,7 +120,7 @@ namespace DCPartC.Controllers
             Client client = await _context.Client.FindAsync(id);
             if (client == null)
             {
-                BadRequest("Empty Client finishing job");
+                return NotFound("Client was not found");
             }
             client.jobsFinished++;
             await _context.SaveChangesAsync();

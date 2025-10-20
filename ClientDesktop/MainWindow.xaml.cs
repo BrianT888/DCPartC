@@ -71,7 +71,7 @@ namespace ClientDesktop
                 RestResponse registerResponse = await client.ExecuteAsync(registerRequest);
                 if (!registerResponse.IsSuccessful)
                 {
-                    MessageBox.Show("Failed to register client: " + registerResponse.ErrorMessage);
+                    MessageBox.Show("Failed to register client: Duplicate Port Found");
                     return;
                 }
 
@@ -100,6 +100,11 @@ namespace ClientDesktop
                 Console.WriteLine($"{user.clientId} is Submitting Supposed Python Job");
                 //api call + client job server call to save jobs
                 string pythonName = PythonInput.Text;// = PythonNameInput.Text;
+                if (string.IsNullOrEmpty(pythonName) )
+                {
+                    MessageBox.Show("Please Enter a python script");
+                    return;
+                }
                 string pythonJob = PythonInput.Text;
 
                 //Encoding and Hashing
