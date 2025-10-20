@@ -91,7 +91,7 @@ namespace DCPartC.Controllers
         {
             if(job == null)
             {
-                return BadRequest("Null Job for Finished Job");
+                return NotFound();
             }
             Job currentJob = await _context.Job.FindAsync(job.jobId);
             currentJob.Result = result;

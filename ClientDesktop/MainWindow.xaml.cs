@@ -139,7 +139,7 @@ namespace ClientDesktop
                 return;
             }
         }
-        private async Task Networking()
+        private async void Networking()
         {
             i = 0;
             while (loop)
@@ -236,14 +236,14 @@ namespace ClientDesktop
                                             RestResponse response1 = await client.ExecuteAsync(request1);
                                             if (!response1.IsSuccessful)
                                             {
-                                                Console.WriteLine("not sucessful " + response1.ErrorMessage);
+                                                Console.WriteLine($"Not successful in updating Finished Job {job.jobId}");
                                             }
 
                                             RestRequest request2 = new RestRequest($"/api/clients/FinishedJob/{user.clientId}", Method.Put);
                                             RestResponse response2 = await client.ExecuteAsync(request2);
                                             if (!response2.IsSuccessful)
                                             {
-                                                Console.WriteLine("Could not increment user job counter");
+                                                Console.WriteLine($"Could not increment user {user.clientId} job counter");
                                             }
                                             status = clientStatus.FindingJob;
                                         }
