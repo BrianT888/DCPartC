@@ -167,11 +167,13 @@ namespace ClientDesktop
                             break;
                         }
 
+                        //need to try catch this
                         ChannelFactory<IClientJobServer> foobFactory;
                         NetTcpBinding tcp = new NetTcpBinding();
                         string otherClientURL = $"net.tcp://127.0.0.1:{otherClient.port}/ClientJobServer";//use loopback 127.0.0.1 for connection to self machine
                         foobFactory = new ChannelFactory<IClientJobServer>(tcp, otherClientURL);
                         IClientJobServer foob = foobFactory.CreateChannel();
+                        //
 
                         Console.WriteLine($"Current Client ID: {user.clientId} -> Client ID: {otherClient.clientId}, IP: {otherClient.ip}, Port: {otherClient.port}");//console output to show which client is being looked at right now by which user
                         //ONLY WORKS IF CLIENT IS ALSO OPEN, IF CLOSE REDO 
@@ -183,7 +185,7 @@ namespace ClientDesktop
                             if (job.jobStatus == Job.Status.Finished)
                             {
                                 Console.WriteLine("Jobs already done");
-                                foob.Execute(job);
+                                foob.Post(job);
                                 continue;//go look at diff client
                             }
                             if (!loop)
@@ -227,7 +229,8 @@ namespace ClientDesktop
                                     {
                                         Console.WriteLine($"{user.clientId} executed code {job.jobId} with result: {res}");
                                         job.Result = res;
-                                        foob.Execute(job);
+                                        foob.Post(job);
+                                        job.jobStatus = Job.Status.Finished;
                                         jobsDone++;
                                         RestRequest request1 = new RestRequest($"api/jobs/FinishedJob/{res}", Method.Put);
                                         request1.AddJsonBody(job);
@@ -235,6 +238,13 @@ namespace ClientDesktop
                                         if (!response1.IsSuccessful)
                                         {
                                             Console.WriteLine("not sucessful " + response1.ErrorMessage);
+                                        }
+
+                                        RestRequest request2 = new RestRequest($"api/clients/FinishedJob/{user.clientId}", Method.Put);
+                                        var response2 = await client.ExecuteAsync(request2);
+                                        if (!response2.IsSuccessful)
+                                        {
+                                            Console.WriteLine("Could not increment user job counter");
                                         }
                                         status = clientStatus.FindingJob;
                                     }

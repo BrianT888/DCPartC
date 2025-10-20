@@ -6,7 +6,7 @@ namespace APIClasses
     public interface IClientJobServer
     {
         [OperationContract]
-        void Execute(Job job);//upload answer
+        void Post(Job job);//upload answer
         [OperationContract]
         bool GetStatus();
         [OperationContract]
