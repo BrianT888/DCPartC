@@ -26,30 +26,6 @@ namespace ClientDesktop
             {
                 return null; // No job available for null check
             }
-            //0 = not started, 1=progress, 2=finished
-            //foreach (Job job in jobList)
-            //{
-            //    if (job.jobStatus == 0)
-            //    {
-            //        return job;
-            //    }
-            //}
-            //return null;
-        }
-
-        public bool GetStatus()//do i need to get status?
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void SubmitJob(Job job)
-        {
-            jobList.Enqueue(job);//add job to the back of queue
-        }
-
-        public int GetNumberOfJobs()
-        {
-            return jobList.Count;
         }
     }
 }

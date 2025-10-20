@@ -8,8 +8,6 @@ namespace APIClasses
         [OperationContract]
         void Post(Job job);//upload answer
         [OperationContract]
-        bool GetStatus();
-        [OperationContract]
         Job GetJob();//download job
     }
 }

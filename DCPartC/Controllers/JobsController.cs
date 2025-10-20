@@ -42,36 +42,6 @@ namespace DCPartC.Controllers
             return job;
         }
 
-        // PUT: api/Jobs/5
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutJob(int id, Job job)
-        //{
-        //    if (id != job.jobId)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _context.Entry(job).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!JobExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
-
         // POST: api/Jobs
         [HttpPost]
         public async Task<ActionResult<Job>> PostJob(Job job)
@@ -115,17 +85,6 @@ namespace DCPartC.Controllers
             return jobs;
         }
 
-        //[HttpPost]
-        //[Route("CreateJobForClient/{clientId}")]
-        //public async Task<ActionResult<Job>> CreateJobForClient(int clientId, Job job)
-        //{
-        //    job.clientId = clientId; //auto set to client id from url no matter input
-        //    job.jobStatus = Job.Status.NotStarted; //auto set it to false when created no matter input
-        //    _context.Job.Add(job);
-        //    await _context.SaveChangesAsync();
-        //    return CreatedAtAction("GetJob", new { id = job.jobId }, job);
-        //}
-
         [HttpPut]
         [Route("FinishedJob/{result}")]
         public async Task<IActionResult> FinishedJob(string result, [FromBody]Job job)
@@ -140,22 +99,5 @@ namespace DCPartC.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
-
-        //[HttpPost]
-        //[Route("CreateJob/{clientId}/{jobName}/{jobDesc}/{hashed}")]
-        //public async Task<ActionResult<Job>> CreateJob(int clientId, string jobName, string jobDesc, string hashed)//testing new one maybe nicer?
-        //{
-        //    var job = new Job
-        //    {
-        //        clientId = clientId,
-        //        jobName = jobName,
-        //        jobDescription = jobDesc,
-        //        jobStatus = Job.Status.NotStarted,
-        //        hash = hashed,
-        //    };
-        //    _context.Job.Add(job);
-        //    await _context.SaveChangesAsync();
-        //    return CreatedAtAction("GetJob", new { id = job.jobId }, job);
-        //}
     }
 }

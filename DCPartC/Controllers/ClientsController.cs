@@ -21,14 +21,6 @@ namespace DCPartC.Controllers
             _context = context;
         }
 
-        // GET: api/Clients
-        // can remove probs, already have a duplicate method below with proper route
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<Client>>> GetClient()
-        //{
-        //    return await _context.Client.ToListAsync();
-        //}
-
         // GET: api/Clients/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Client>> GetClient(int id)
@@ -43,50 +35,9 @@ namespace DCPartC.Controllers
             return client;
         }
 
-        // PUT: api/Clients/5
-        //shouldn't be able to update clients not in the spec
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutClient(int id, Client client)
-        //{
-        //    if (id != client.clientId)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _context.Entry(client).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!ClientExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
-
-        // POST: api/Clients
-        //this method is also duplicate, since below i have a register format specified already?
-        //[HttpPost]
-        //public async Task<ActionResult<Client>> PostClient(Client client)
-        //{
-        //    _context.Client.Add(client);
-        //    await _context.SaveChangesAsync();
-
-        //    return CreatedAtAction("GetClient", new { id = client.clientId }, client);
-        //}
-
         // DELETE: api/Clients/5
-        [HttpDelete("{id}")]
+        [HttpDelete]
+        [Route("UseID/{id}")]
         public async Task<IActionResult> DeleteClient(int id)
         {
             var client = await _context.Client.FindAsync(id);
@@ -101,6 +52,21 @@ namespace DCPartC.Controllers
             return NoContent();
         }
 
+        [HttpDelete]
+        [Route("UsePort/{port}")]
+        public async Task<IActionResult> DeleteClientPort(int port)
+        {
+            var client = await _context.Client.FirstOrDefaultAsync(c => c.port == port);
+            if (client == null)
+            {
+                return NotFound();
+            }
+
+            _context.Client.Remove(client);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
         private bool ClientExists(int id)
         {
             return _context.Client.Any(e => e.clientId == id);
