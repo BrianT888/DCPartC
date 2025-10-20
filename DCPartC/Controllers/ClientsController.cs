@@ -116,7 +116,7 @@ namespace DCPartC.Controllers
                 return BadRequest("Duplicate port found");
             }
 
-            var client = new Client { ip = ip, port = port };
+            var client = new Client { ip = ip, port = port, jobsFinished = 0 };
             _context.Client.Add(client);
             await _context.SaveChangesAsync();
             return CreatedAtAction("GetClient", new { id = client.clientId }, client);
@@ -145,6 +145,20 @@ namespace DCPartC.Controllers
             }
 
             return clientList;
+        }
+
+        [HttpPut]
+        [Route("FinishedJob/{id}")]
+        public async Task<IActionResult> FinishedJob(int id)
+        {
+            Client client = await _context.Client.FindAsync(id);
+            if (client == null)
+            {
+                BadRequest("Empty Client finishing job");
+            }
+            client.jobsFinished++;
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
     }
 }

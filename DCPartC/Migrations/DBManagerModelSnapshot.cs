@@ -25,6 +25,9 @@ namespace DCPartC.Migrations
                     b.Property<string>("ip")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("jobsFinished")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("port")
                         .HasColumnType("INTEGER");
 

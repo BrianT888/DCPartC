@@ -10,7 +10,7 @@ namespace ClientDesktop
     public class ClientJobServer : IClientJobServer
     {
         public static ConcurrentQueue<Job> jobList = new ConcurrentQueue<Job>();//list of jobs in server in concurrent q for thread safety if multiple access the data at once
-        public void Execute(Job job)
+        public void Post(Job job)
         {
             job.jobStatus = Job.Status.Finished;
             jobList.Enqueue(job);//put it back into the list
