@@ -162,11 +162,7 @@ namespace ClientDesktop
 
                     foreach (var otherClient in otherClients)
                     {
-                        if (!loop)
-                        {
-                            Console.WriteLine("Trying to exit for each loop");
-                            break;
-                        }
+                        if (!loop) { break; }
                         try
                         {
                             ChannelFactory<IClientJobServer> foobFactory;
@@ -187,11 +183,7 @@ namespace ClientDesktop
                                     foob.Post(job);
                                     continue;//go look at diff client
                                 }
-                                if (!loop)
-                                {
-                                    Console.WriteLine("Trying to exit for each loop");
-                                    break;
-                                }
+                                if (!loop) { break; }
 
                                 //do stuff here
                                 Console.WriteLine("Client " + user.clientId + " obtained job from client ID " + otherClient.clientId);//
@@ -208,11 +200,7 @@ namespace ClientDesktop
                                 {
                                     if (hashCheck.SequenceEqual(job.hash))
                                     {
-                                        if (!loop)
-                                        {
-                                            Console.WriteLine("Trying to exit for each loop");
-                                            break;
-                                        }
+                                        if (!loop) { break; }
                                         status = clientStatus.Working;
 
                                         Console.WriteLine($"Client {user.clientId} has found Hashes are equal for {job.jobId}");
@@ -226,11 +214,14 @@ namespace ClientDesktop
                                         string res = Convert.ToString(result);
                                         if (result != null)
                                         {
+                                            if (!loop) { break; }
                                             Console.WriteLine($"{user.clientId} executed code {job.jobId} with result: {res}");
                                             job.Result = res;
                                             foob.Post(job);
                                             job.jobStatus = Job.Status.Finished;
                                             jobsDone++;
+
+                                            if (!loop) { break; }
                                             RestRequest request1 = new RestRequest($"/api/jobs/FinishedJob/{res}", Method.Put);
                                             request1.AddJsonBody(job);
                                             RestResponse response1 = await client.ExecuteAsync(request1);
@@ -239,6 +230,7 @@ namespace ClientDesktop
                                                 Console.WriteLine($"Not successful in updating Finished Job {job.jobId}");
                                             }
 
+                                            if(!loop) { break; }
                                             RestRequest request2 = new RestRequest($"/api/clients/FinishedJob/{user.clientId}", Method.Put);
                                             RestResponse response2 = await client.ExecuteAsync(request2);
                                             if (!response2.IsSuccessful)
@@ -247,7 +239,6 @@ namespace ClientDesktop
                                             }
                                             status = clientStatus.FindingJob;
                                         }
-
                                     } else
                                     {
                                         Console.WriteLine($"Hashes do not match, something went wrong");
@@ -278,7 +269,6 @@ namespace ClientDesktop
                 {
                     Console.WriteLine($"{user.clientId} can not see anyone");
                 }
-
                 await Task.Delay(1000);
             }
         }
