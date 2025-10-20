@@ -16,43 +16,48 @@ namespace DCPartC.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.20");
 
-            modelBuilder.Entity("DCPartC.Models.Client", b =>
+            modelBuilder.Entity("APIClasses.Client", b =>
                 {
                     b.Property<int>("clientId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ip")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("port")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("jobsFinished")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("port")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("clientId");
 
                     b.ToTable("Client");
                 });
 
-            modelBuilder.Entity("DCPartC.Models.Job", b =>
+            modelBuilder.Entity("APIClasses.Job", b =>
                 {
                     b.Property<int>("jobId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Result")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("clientId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<byte[]>("hash")
+                        .HasColumnType("BLOB");
+
                     b.Property<string>("jobDescription")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("jobName")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("jobStatus")
+                    b.Property<int>("jobStatus")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("jobId");
@@ -62,9 +67,9 @@ namespace DCPartC.Migrations
                     b.ToTable("Job");
                 });
 
-            modelBuilder.Entity("DCPartC.Models.Job", b =>
+            modelBuilder.Entity("APIClasses.Job", b =>
                 {
-                    b.HasOne("DCPartC.Models.Client", null)
+                    b.HasOne("APIClasses.Client", null)
                         .WithMany()
                         .HasForeignKey("clientId")
                         .OnDelete(DeleteBehavior.Cascade)

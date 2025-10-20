@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DCPartC.Data;
-using DCPartC.Models;
+using APIClasses;
 
 namespace DCPartC.Controllers
 {
@@ -42,45 +42,15 @@ namespace DCPartC.Controllers
             return job;
         }
 
-        // PUT: api/Jobs/5
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutJob(int id, Job job)
-        //{
-        //    if (id != job.jobId)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _context.Entry(job).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!JobExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
-
         // POST: api/Jobs
-        //[HttpPost]
-        //public async Task<ActionResult<Job>> PostJob(Job job)
-        //{
-        //    _context.Job.Add(job);
-        //    await _context.SaveChangesAsync();
+        [HttpPost]
+        public async Task<ActionResult<Job>> PostJob(Job job)
+        {
+            _context.Job.Add(job);
+            await _context.SaveChangesAsync();
 
-        //    return CreatedAtAction("GetJob", new { id = job.jobId }, job);
-        //}
+            return CreatedAtAction("GetJob", new { id = job.jobId }, job);
+        }
 
         // DELETE: api/Jobs/5
         [HttpDelete("{id}")]
@@ -115,27 +85,17 @@ namespace DCPartC.Controllers
             return jobs;
         }
 
-        [HttpPost]
-        [Route("CreateJobForClient/{clientId}")]
-        public async Task<ActionResult<Job>> CreateJobForClient(int clientId, Job job)
-        {
-            job.clientId = clientId; //auto set to client id from url no matter input
-            job.jobStatus = false; //auto set it to false when created no matter input
-            _context.Job.Add(job);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction("GetJob", new { id = job.jobId }, job);
-        }
-
         [HttpPut]
-        [Route("FinishedJob/{id}")]
-        public async Task<IActionResult> FinishedJob(int id)
+        [Route("FinishedJob/{result}")]
+        public async Task<IActionResult> FinishedJob(string result, [FromBody]Job job)
         {
-            var job = await _context.Job.FindAsync(id);
-            if (job == null)
+            if(job == null)
             {
                 return NotFound();
             }
-            job.jobStatus = true;
+            Job currentJob = await _context.Job.FindAsync(job.jobId);
+            currentJob.Result = result;
+            currentJob.jobStatus = job.jobStatus;
             await _context.SaveChangesAsync();
             return NoContent();
         }
