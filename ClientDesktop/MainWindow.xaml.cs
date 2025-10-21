@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Security.Policy;
 using System.ServiceModel;
@@ -56,7 +57,16 @@ namespace ClientDesktop
                     MessageBox.Show("IP must be provided");
                     return;
                 }
+                //ip address format validation
+                if(!IPAddress.TryParse(ip, out IPAddress ipAddress))
+                {
+                    MessageBox.Show("Please enter in a proper ip address like 192.168.0.1");
+                    return;
+                }
                 
+
+                ip = ipAddress.ToString();//turn it back to the ip string
+
                 if (port < 1 || port > 65535)//port validation
                 {
                     MessageBox.Show("Port number must be between 1 and 65535.");
