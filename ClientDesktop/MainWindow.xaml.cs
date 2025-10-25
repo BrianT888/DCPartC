@@ -224,16 +224,19 @@ namespace ClientDesktop
                                         Console.WriteLine($"Client {user.clientId} picked up job with python script :({python}) from {otherClient.clientId}");
 
                                         //Using python string which is the python script, let the iron python run it
-                                        dynamic result = RunPythonJobDescription(python);
+                                        dynamic result = RunPythonJobDescription(python, job);
                                         await Task.Delay(2000);
                                         string res = Convert.ToString(result);
-                                        if (result != null)
+                                        if (job.jobStatus == Job.Status.Finished)
                                         {
                                             if (!loop) { break; }
                                             Console.WriteLine($"{user.clientId} executed code {job.jobId} with result: {res}");
+                                            if(string.IsNullOrEmpty(res))
+                                            {
+                                                res = "Printed";//for python prints
+                                            }
                                             job.Result = res;
                                             foob.Post(job);
-                                            job.jobStatus = Job.Status.Finished;
                                             jobsDone++;
 
                                             if (!loop) { break; }
@@ -294,14 +297,9 @@ namespace ClientDesktop
             Task.Run(() => Networking());
         }
 
-        private dynamic RunPythonJobDescription(string pythonCode)
+        private dynamic RunPythonJobDescription(string pythonCode, Job job)
         {
             dynamic result = null;
-            if (pythonCode.Contains("print(") )//parses and gets the middle value of the print()
-            {
-                pythonCode = pythonCode.Split('(', ')')[1];
-                Console.WriteLine("Just split " + pythonCode);
-            }
 
             try
             {
@@ -309,6 +307,7 @@ namespace ClientDesktop
                 ScriptScope scope = engine.CreateScope();
                 result = engine.Execute(pythonCode, scope);
                 Console.WriteLine("Inside python " + result);
+                job.jobStatus = Job.Status.Finished;
             }
             catch (Exception ex)
             {
